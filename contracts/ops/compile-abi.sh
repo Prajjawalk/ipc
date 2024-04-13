@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Compile contract and output core contracts ABI
 set -eu
 set -o pipefail
