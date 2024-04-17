@@ -14,16 +14,27 @@ use fvm_shared::clock::ChainEpoch;
 use fvm_shared::randomness::RANDOMNESS_LENGTH;
 use fvm_shared::sys::out::network::NetworkContext;
 use fvm_shared::sys::out::vm::MessageContext;
-use fvm_shared::{address::Address, econ::TokenAmount, ActorID, MethodNum};
+use fvm_shared::{econ::TokenAmount, ActorID, MethodNum};
 
 use ambassador::Delegate;
 use cid::Cid;
 
+use ethers::{
+    prelude::abigen,
+    providers::{Http, Middleware, Provider},
+    // types::Address,
+};
 use reqwest::blocking::get;
+use std::sync::Arc;
 
-// we define a single custom syscall which simply doubles the input
+// we define a single custom syscall which fetch recommendations from stylus contract
 pub trait CustomKernel: Kernel {
-    fn my_custom_syscall(&self) -> Result<u64>;
+    fn my_custom_syscall(
+        &self,
+        user_index: i64,
+        user_activity_matrix: Vec<Vec<i64>>,
+        k: i64,
+    ) -> Result<Vec<Vec<i64>>>;
 }
 
 // our custom kernel extends the filecoin kernel
@@ -46,21 +57,42 @@ where
     C: CallManager,
     CustomKernelImpl<C>: Kernel,
 {
-    fn my_custom_syscall(&self) -> Result<u64> {
+    fn my_custom_syscall(
+        &self,
+        user_index: i64,
+        user_activity_matrix: Vec<Vec<i64>>,
+        k: i64,
+    ) -> Result<Vec<Vec<i64>>> {
         // currently this is not deterministic since sometimes the request is rate limited
 
-        let response =
-            match get("https://ipfs.io/ipfs/Qmbi6GYikeZYxdNWsLsZY75xgB9Uuy55zZdMT2hedCxGSr") {
-                Ok(resp) => resp,
-                Err(_) => return Ok(0),
-            };
+        // abigen!(
+        //   IRecommendation,
+        //   "[function getRecommendations(int64[][] memory user_activity_matrix, int64 user_index, int64 k) external view returns (int64[][] memory)]"
+        // );
 
-        let body = match response.bytes() {
-            Ok(bytes) => bytes,
-            Err(_) => return Ok(0),
-        };
+        // let provider = Arc::new(Provider::try_from(
+        //     "https://stylus-testnet.arbitrum.io/rpc",
+        // )?);
 
-        Ok(body.len() as u64)
+        // let recommender = IRecommendation::new(
+        //     "0xa69E3ccFd133A80B92CD93De555243416c19E566".parse()?,
+        //     provider,
+        // );
+
+        // async {
+        //     let recommendation_matrix = recommender
+        //         .get_recommendations(user_activity_matrix, user_index, k)
+        //         .call()
+        //         .await?;
+
+        //     match recommendation_matrix {
+        //         Err(_) => Ok(vec![vec![0, 0, 0, 0, 0]]),
+        //     };
+
+        //     Ok(recommendation_matrix);
+        // };
+        let result: Vec<Vec<i64>> = vec![vec![1, 1, 1, 1, 1]];
+        Ok(result)
     }
 }
 
@@ -139,6 +171,13 @@ where
     }
 }
 
-pub fn my_custom_syscall(context: fvm::syscalls::Context<'_, impl CustomKernel>) -> Result<u64> {
-    context.kernel.my_custom_syscall()
+pub fn my_custom_syscall(
+    context: fvm::syscalls::Context<'_, impl CustomKernel>,
+    user_index: i64,
+    user_activity_matrix: Vec<Vec<i64>>,
+    k: i64,
+) -> Result<Vec<Vec<i64>>> {
+    context
+        .kernel
+        .my_custom_syscall(user_index, user_activity_matrix, k)
 }

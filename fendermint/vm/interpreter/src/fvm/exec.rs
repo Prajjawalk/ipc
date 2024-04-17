@@ -132,13 +132,25 @@ where
         }
 
         {
+            let params = fvm_ipld_encoding::RawBytes::serialize(
+                fendermint_actor_customsyscall::InvokeParams {
+                    user_index: 0,
+                    user_activity_matrix: vec![
+                        vec![1, 0, 1, 0, 1],
+                        vec![0, 1, 1, 0, 0],
+                        vec![1, 1, 0, 1, 0],
+                        vec![0, 1, 0, 0, 1],
+                    ],
+                    k: 2,
+                },
+            )?;
             let msg = FvmMessage {
                 from: system::SYSTEM_ACTOR_ADDR,
                 to: customsyscall::CUSTOMSYSCALL_ACTOR_ADDR,
                 sequence: height as u64,
                 gas_limit,
                 method_num: fendermint_actor_customsyscall::Method::Invoke as u64,
-                params: Default::default(),
+                params,
                 value: Default::default(),
                 version: Default::default(),
                 gas_fee_cap: Default::default(),
@@ -151,8 +163,16 @@ where
                 anyhow::bail!("failed to apply customsyscall message: {}", err);
             }
 
-            let val: u64 = apply_ret.msg_receipt.return_data.deserialize().unwrap();
-            println!("customsyscall actor returned: {}", val);
+            let val: Vec<Vec<i64>> = apply_ret.msg_receipt.return_data.deserialize().unwrap();
+            println!("customsyscall actor returned: {}", val[0][0]);
+            println!(
+                "customsyscall actor returned: {}",
+                system::SYSTEM_ACTOR_ADDR
+            );
+            // println!(
+            //     "customsyscall actor returned: {}",
+            //     fendermint_actor_customsyscall::Method::Invoke as Vec<Vec<i64>>
+            // );
         }
 
         let ret = FvmApplyRet {
