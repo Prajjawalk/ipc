@@ -135,12 +135,6 @@ where
             let params = fvm_ipld_encoding::RawBytes::serialize(
                 fendermint_actor_customsyscall::InvokeParams {
                     user_index: 0,
-                    user_activity_matrix: vec![
-                        vec![1, 0, 1, 0, 1],
-                        vec![0, 1, 1, 0, 0],
-                        vec![1, 1, 0, 1, 0],
-                        vec![0, 1, 0, 0, 1],
-                    ],
                     k: 2,
                 },
             )?;
@@ -163,8 +157,8 @@ where
                 anyhow::bail!("failed to apply customsyscall message: {}", err);
             }
 
-            let val: Vec<Vec<i64>> = apply_ret.msg_receipt.return_data.deserialize().unwrap();
-            println!("customsyscall actor returned: {}", val[0][0]);
+            let val: i64 = apply_ret.msg_receipt.return_data.deserialize().unwrap();
+            println!("customsyscall actor returned: {}", val);
             println!(
                 "customsyscall actor returned: {}",
                 system::SYSTEM_ACTOR_ADDR

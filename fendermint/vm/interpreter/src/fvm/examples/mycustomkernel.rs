@@ -32,9 +32,9 @@ pub trait CustomKernel: Kernel {
     fn my_custom_syscall(
         &self,
         user_index: i64,
-        user_activity_matrix: Vec<Vec<i64>>,
+        // user_activity_matrix: Vec<Vec<i64>>,
         k: i64,
-    ) -> Result<Vec<Vec<i64>>>;
+    ) -> Result<i64>;
 }
 
 // our custom kernel extends the filecoin kernel
@@ -60,9 +60,9 @@ where
     fn my_custom_syscall(
         &self,
         user_index: i64,
-        user_activity_matrix: Vec<Vec<i64>>,
+        // user_activity_matrix: Vec<Vec<i64>>,
         k: i64,
-    ) -> Result<Vec<Vec<i64>>> {
+    ) -> Result<i64> {
         // currently this is not deterministic since sometimes the request is rate limited
 
         // abigen!(
@@ -91,8 +91,7 @@ where
 
         //     Ok(recommendation_matrix);
         // };
-        let result: Vec<Vec<i64>> = vec![vec![1, 1, 1, 1, 1]];
-        Ok(result)
+        Ok(k + user_index)
     }
 }
 
@@ -165,19 +164,17 @@ where
     fn link_syscalls(linker: &mut Linker<K>) -> anyhow::Result<()> {
         DefaultKernel::<K::CallManager>::link_syscalls(linker)?;
 
-        linker.link_syscall("my_custom_kernel", "my_custom_syscall", my_custom_syscall)?;
+        linker.link_syscall("my_custom_kernel", "my_custom_syscall", my_custom_syscall2)?;
 
         Ok(())
     }
 }
 
-pub fn my_custom_syscall(
+pub fn my_custom_syscall2(
     context: fvm::syscalls::Context<'_, impl CustomKernel>,
     user_index: i64,
-    user_activity_matrix: Vec<Vec<i64>>,
+    // user_activity_matrix: Vec<Vec<i64>>,
     k: i64,
-) -> Result<Vec<Vec<i64>>> {
-    context
-        .kernel
-        .my_custom_syscall(user_index, user_activity_matrix, k)
+) -> Result<i64> {
+    context.kernel.my_custom_syscall(user_index, k)
 }
