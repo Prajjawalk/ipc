@@ -164,13 +164,13 @@ where
     fn link_syscalls(linker: &mut Linker<K>) -> anyhow::Result<()> {
         DefaultKernel::<K::CallManager>::link_syscalls(linker)?;
 
-        linker.link_syscall("my_custom_kernel", "my_custom_syscall", my_custom_syscall2)?;
+        linker.link_syscall("my_custom_kernel", "my_custom_syscall", my_custom_syscall)?;
 
         Ok(())
     }
 }
 
-pub fn my_custom_syscall2(
+pub fn my_custom_syscall(
     context: fvm::syscalls::Context<'_, impl CustomKernel>,
     user_index: i64,
     // user_activity_matrix: Vec<Vec<i64>>,
