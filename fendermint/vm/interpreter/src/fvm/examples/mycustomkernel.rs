@@ -61,7 +61,7 @@ where
     fn my_custom_syscall(
         &self,
         user_index: i64,
-        user_activity_matrix: Vec<Vec<i64>>,
+        user_activity_matrix: [u8; 1000],
         k: i64,
     ) -> Result<[u8; 1000]> {
         // currently this is not deterministic since sometimes the request is rate limited
@@ -82,7 +82,7 @@ where
 
         async {
             let recommendation_matrix = recommender
-                .get_recommendations(user_activity_matrix, user_index, k)
+                .get_recommendations(user_activity_matrix.to_vec(), user_index, k)
                 .call()
                 .await?;
 
