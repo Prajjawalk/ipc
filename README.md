@@ -1,4 +1,4 @@
-# InterPlanetary Consensus (IPC)
+# OpenAnalyse IPC Subnet
 
 **‼️ All the modules in the IPC stack (including the contracts) haven't been audited, tested in depth, or otherwise verified. Moreover, the system is missing critical recovery functionality in case of crashes. There are multiple ways in which you may lose funds moved into an IPC subnet, and we strongly advise against deploying IPC on mainnet and/or using it with tokens with real value.**
 
@@ -102,6 +102,42 @@ provider_http = "https://api.calibration.node.glif.io/rpc/v1"
 gateway_addr = "0x1AEe8A878a22280fc2753b3C63571C8F895D2FE3"
 registry_addr = "0x0b4e239FF21b40120cDa817fba77bD1B366c1bcD"
 ```
+
+## Deployed subnet details
+
+#################################
+
+#
+
+# Subnet node ready! 🚀
+
+#
+
+#################################
+
+Subnet ID:
+/r314159/t410f5cra5lwc4qbdpeuvdqh5hnjlyb52flcs7d32szq
+
+Eth API:
+http://0.0.0.0:8545
+
+Chain ID:
+4357475745646590
+
+Fendermint API:
+http://localhost:26658
+
+CometBFT API:
+http://0.0.0.0:26657
+
+CometBFT node ID:
+3122b96a28bbbf544b8bbc8f23b8a4433e94ef71
+
+CometBFT P2P:
+http://0.0.0.0:26656
+
+IPLD Resolver Multiaddress:
+/ip4/0.0.0.0/tcp/26655/p2p/16Uiu2HAkxeRYj1imvfo53YqZuEcJm7DZTQWmdhAtHPcEz5mDqRe8
 
 To be able to interact with Calibration and run new subnets, some FIL should be provided to, at least, the wallet that will be used by the `ipc-cli` to interact with IPC. You can request some tFIL for your address through the [Calibration Faucet](https://faucet.calibration.fildev.network/funds.html).
 
