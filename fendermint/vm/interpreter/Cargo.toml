@@ -64,6 +64,7 @@ arbitrary = { workspace = true, optional = true }
 quickcheck = { workspace = true, optional = true }
 rand = { workspace = true, optional = true }
 reqwest = { version = "0.12.3", features = ["blocking"] }
+cbor = { version = "0.4.1" }
 
 [dev-dependencies]
 quickcheck = { workspace = true }

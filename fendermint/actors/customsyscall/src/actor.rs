@@ -16,17 +16,17 @@ fvm_sdk::sys::fvm_syscalls! {
     module = "my_custom_kernel";
     pub fn my_custom_syscall(
       user_index: i64,
-      // user_activity_matrix: Vec<Vec<i64>>,
-      k: i64) -> Result<i64>;
+      // user_activity_matrix: [i64; 5],
+      k: i64) -> Result<[u8;1000]>;
 }
 
 pub struct Actor;
 impl Actor {
-    fn invoke(rt: &impl Runtime, params: InvokeParams) -> Result<i64, ActorError> {
+    fn invoke(rt: &impl Runtime, params: InvokeParams) -> Result<[u8; 1000], ActorError> {
         rt.validate_immediate_caller_is(std::iter::once(&SYSTEM_ACTOR_ADDR))?;
 
         unsafe {
-            let value = my_custom_syscall(params.user_index, params.k).unwrap();
+            let value: [u8; 1000] = my_custom_syscall(params.user_index, params.k).unwrap();
             Ok(value)
         }
     }

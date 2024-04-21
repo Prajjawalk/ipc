@@ -19,6 +19,7 @@ use fvm_shared::{econ::TokenAmount, ActorID, MethodNum};
 use ambassador::Delegate;
 use cid::Cid;
 
+use cbor::{Decoder, Encoder};
 use ethers::{
     prelude::abigen,
     providers::{Http, Middleware, Provider},
@@ -32,9 +33,9 @@ pub trait CustomKernel: Kernel {
     fn my_custom_syscall(
         &self,
         user_index: i64,
-        // user_activity_matrix: Vec<Vec<i64>>,
+        // user_activity_matrix: [i64; 5],
         k: i64,
-    ) -> Result<i64>;
+    ) -> Result<[u8; 1000]>;
 }
 
 // our custom kernel extends the filecoin kernel
@@ -60,38 +61,49 @@ where
     fn my_custom_syscall(
         &self,
         user_index: i64,
-        // user_activity_matrix: Vec<Vec<i64>>,
+        user_activity_matrix: Vec<Vec<i64>>,
         k: i64,
-    ) -> Result<i64> {
+    ) -> Result<[u8; 1000]> {
         // currently this is not deterministic since sometimes the request is rate limited
 
-        // abigen!(
-        //   IRecommendation,
-        //   "[function getRecommendations(int64[][] memory user_activity_matrix, int64 user_index, int64 k) external view returns (int64[][] memory)]"
-        // );
+        abigen!(
+          IRecommendation,
+          "[function getRecommendations(int64[][] memory user_activity_matrix, int64 user_index, int64 k) external view returns (int64[][] memory)]"
+        );
 
-        // let provider = Arc::new(Provider::try_from(
-        //     "https://stylus-testnet.arbitrum.io/rpc",
-        // )?);
+        let provider = Arc::new(Provider::try_from(
+            "https://stylus-testnet.arbitrum.io/rpc",
+        )?);
 
-        // let recommender = IRecommendation::new(
-        //     "0xa69E3ccFd133A80B92CD93De555243416c19E566".parse()?,
-        //     provider,
-        // );
+        let recommender = IRecommendation::new(
+            "0xa69E3ccFd133A80B92CD93De555243416c19E566".parse()?,
+            provider,
+        );
 
-        // async {
-        //     let recommendation_matrix = recommender
-        //         .get_recommendations(user_activity_matrix, user_index, k)
-        //         .call()
-        //         .await?;
+        async {
+            let recommendation_matrix = recommender
+                .get_recommendations(user_activity_matrix, user_index, k)
+                .call()
+                .await?;
 
-        //     match recommendation_matrix {
-        //         Err(_) => Ok(vec![vec![0, 0, 0, 0, 0]]),
-        //     };
+            let mut result: [u8; 1000] = [0; 1000];
 
-        //     Ok(recommendation_matrix);
-        // };
-        Ok(k + user_index)
+            match recommendation_matrix {
+                Err(_) => Ok(result),
+            };
+            let mut e = Encoder::from_memory();
+            e.encode(&recommendation_matrix).unwrap();
+
+            let bytes_arr = e.as_bytes().clone();
+            let mut idx = 0;
+            for i in bytes_arr.iter() {
+                if idx == 1000 {
+                    break;
+                }
+                result[idx] = i.clone();
+            }
+            Ok(result)
+        };
     }
 }
 
@@ -173,8 +185,8 @@ where
 pub fn my_custom_syscall(
     context: fvm::syscalls::Context<'_, impl CustomKernel>,
     user_index: i64,
-    // user_activity_matrix: Vec<Vec<i64>>,
+    // user_activity_matrix: [i64; 5],
     k: i64,
-) -> Result<i64> {
+) -> Result<[u8; 1000]> {
     context.kernel.my_custom_syscall(user_index, k)
 }
