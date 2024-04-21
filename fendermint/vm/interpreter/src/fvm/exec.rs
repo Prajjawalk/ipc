@@ -135,7 +135,7 @@ where
             let params = fvm_ipld_encoding::RawBytes::serialize(
                 fendermint_actor_customsyscall::InvokeParams {
                     user_index: 0,
-                    // user_activity_matrix: [1, 1, 1, 1, 1],
+                    user_activity_matrix: [1; 1000],
                     k: 2,
                 },
             )?;

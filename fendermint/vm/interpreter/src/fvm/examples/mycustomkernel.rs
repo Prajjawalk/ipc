@@ -33,7 +33,7 @@ pub trait CustomKernel: Kernel {
     fn my_custom_syscall(
         &self,
         user_index: i64,
-        // user_activity_matrix: [i64; 5],
+        user_activity_matrix: [u8; 1000],
         k: i64,
     ) -> Result<[u8; 1000]>;
 }
@@ -185,7 +185,7 @@ where
 pub fn my_custom_syscall(
     context: fvm::syscalls::Context<'_, impl CustomKernel>,
     user_index: i64,
-    // user_activity_matrix: [i64; 5],
+    user_activity_matrix: [u8; 1000],
     k: i64,
 ) -> Result<[u8; 1000]> {
     context.kernel.my_custom_syscall(user_index, k)

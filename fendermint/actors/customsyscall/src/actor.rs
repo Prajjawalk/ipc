@@ -16,7 +16,7 @@ fvm_sdk::sys::fvm_syscalls! {
     module = "my_custom_kernel";
     pub fn my_custom_syscall(
       user_index: i64,
-      // user_activity_matrix: [i64; 5],
+      user_activity_matrix: [u8; 1000],
       k: i64) -> Result<[u8;1000]>;
 }
 
@@ -26,7 +26,9 @@ impl Actor {
         rt.validate_immediate_caller_is(std::iter::once(&SYSTEM_ACTOR_ADDR))?;
 
         unsafe {
-            let value: [u8; 1000] = my_custom_syscall(params.user_index, params.k).unwrap();
+            let value: [u8; 1000] =
+                my_custom_syscall(params.user_index, params.user_activity_matrix, params.k)
+                    .unwrap();
             Ok(value)
         }
     }

@@ -9,7 +9,7 @@ pub const CUSTOMSYSCALL_ACTOR_NAME: &str = "customsyscall";
 #[derive(Default, Debug, Serialize_tuple, Deserialize_tuple)]
 pub struct InvokeParams {
     pub user_index: i64,
-    // pub user_activity_matrix: [i64; 5],
+    pub user_activity_matrix: [u8; 1000],
     pub k: i64,
 }
 
